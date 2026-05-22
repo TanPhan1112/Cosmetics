@@ -71,7 +71,7 @@ export default function Users() {
                             {users.map((user, index) => (
                                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-5 py-3.5 text-sm text-gray-500">{index + 1}</td>
-                                    <td className="px-5 py-3.5 text-xs font-mono text-gray-400">{user.id}</td>
+                                    <td className="px-5 py-3.5 text-xs font-mono text-gray-400">{user.id ?? 'N/A'}</td>
                                     <td className="px-5 py-3.5 text-sm font-medium text-gray-800">{user.username}</td>
                                     <td className="px-5 py-3.5 text-sm text-gray-600">{user.email}</td>
                                     <td className="px-5 py-3.5">

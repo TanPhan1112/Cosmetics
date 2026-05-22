@@ -50,20 +50,24 @@ export default function Orders() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {orders.map((order) => (
-                            <tr key={order.id}>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{order.id}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{order.shippingInfo.name}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(order.date).toLocaleDateString()}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{order.total.toLocaleString()}₫</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{order.paymentMethod}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm">
-                                    <span className={`inline-flex rounded-full px-2 py-1 ${STATUS_CONFIG[order.status]?.className || 'bg-gray-50 text-gray-500 ring-1 ring-gray-200'}`}>
-                                        {STATUS_CONFIG[order.status]?.label || order.status}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
+                        {orders.map((order) => {
+                            const customerName = order.shippingInfo?.name || order.user_email || 'Khách hàng ẩn danh';
+                            const orderTotal = order.total ?? order.total_price ?? 0;
+                            return (
+                                <tr key={order.id}>
+                                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{order.id}</td>
+                                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{customerName}</td>
+                                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(order.date).toLocaleDateString()}</td>
+                                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{orderTotal.toLocaleString()}₫</td>
+                                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900">{order.paymentMethod || 'N/A'}</td>
+                                    <td className="px-5 py-4 whitespace-nowrap text-sm">
+                                        <span className={`inline-flex rounded-full px-2 py-1 ${STATUS_CONFIG[order.status]?.className || 'bg-gray-50 text-gray-500 ring-1 ring-gray-200'}`}>
+                                            {STATUS_CONFIG[order.status]?.label || order.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

@@ -1037,17 +1037,21 @@ app.get("/api/orders", authenticateJWT, (req, res) => {
 
 // Thêm đơn hàng mới (dành cho người dùng đã đăng nhập)
 app.post("/api/orders", authenticateJWT, (req, res) => {
-    const { items, total_price, total } = req.body;
+    const { items, total_price, total, subtotal, shipping, shippingInfo, paymentMethod } = req.body;
     const orderTotal = total_price ?? total;
-    if (!items || !orderTotal) {
+    if (!items || !orderTotal || !shippingInfo || !paymentMethod || subtotal === undefined || shipping === undefined) {
         return res
             .status(400)
-            .json({ message: "Items and total price are required" });
+            .json({ message: "Items, shipping info, payment method and totals are required" });
     }
     const order = {
         id: `ORD-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-        date: new Date(),
+        date: new Date().toISOString(),
         items,
+        shippingInfo,
+        paymentMethod,
+        subtotal,
+        shipping,
         total_price: orderTotal,
         total: orderTotal,
         user_email: req.user.email,

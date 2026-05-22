@@ -70,5 +70,7 @@ export interface Order {
     subtotal: number;
     shipping: number;
     total: number;
+    total_price?: number;
+    user_email?: string;
     status: string;
 }
