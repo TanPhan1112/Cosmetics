@@ -1037,8 +1037,9 @@ app.get("/api/orders", authenticateJWT, (req, res) => {
 
 // Thêm đơn hàng mới (dành cho người dùng đã đăng nhập)
 app.post("/api/orders", authenticateJWT, (req, res) => {
-    const { items, total_price } = req.body;
-    if (!items || !total_price) {
+    const { items, total_price, total } = req.body;
+    const orderTotal = total_price ?? total;
+    if (!items || !orderTotal) {
         return res
             .status(400)
             .json({ message: "Items and total price are required" });
@@ -1047,7 +1048,8 @@ app.post("/api/orders", authenticateJWT, (req, res) => {
         id: `ORD-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
         date: new Date(),
         items,
-        total_price,
+        total_price: orderTotal,
+        total: orderTotal,
         user_email: req.user.email,
         status: "Chờ xác nhận",
     };

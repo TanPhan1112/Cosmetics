@@ -34,6 +34,7 @@ export default function ThanhToan() {
     const [placing, setPlacing] = useState(false);
     const [form, setForm] = useState({ name: '', phone: '', address: '', note: '' });
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [submitError, setSubmitError] = useState('');
 
     // Login guard
     useEffect(() => {
@@ -77,10 +78,10 @@ export default function ThanhToan() {
     const handlePlaceOrder = async () => {
         if (!validate()) return;
         setPlacing(true);
+        setSubmitError('');
         await new Promise(r => setTimeout(r, 1200));
         const orderId = 'ORD-' + Date.now().toString(36).toUpperCase();
 
-        // Save order to localStorage so profile page can show it
         const order = {
             date: new Date().toISOString(),
             items: displayItems.map(i => ({
@@ -96,19 +97,33 @@ export default function ThanhToan() {
             subtotal,
             shipping,
             total,
+            total_price: total,
             status: 'Chờ xác nhận',
         };
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${getToken()}`,
-            },
-            body: JSON.stringify(order),
-        });
 
-        dispatch(clearCart());
-        router.push(`/dat-hang-thanh-cong?orderId=${orderId}&total=${total}`);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${getToken()}`,
+                },
+                body: JSON.stringify(order),
+            });
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                setSubmitError(data?.message || 'Đặt hàng thất bại. Vui lòng thử lại.');
+                setPlacing(false);
+                return;
+            }
+
+            dispatch(clearCart());
+            router.push(`/dat-hang-thanh-cong?orderId=${orderId}&total=${total}`);
+        } catch (err) {
+            setSubmitError('Không thể kết nối đến server. Vui lòng thử lại.');
+            setPlacing(false);
+        }
     };
 
     if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><LoadingSpinner size="lg" /></div>;
@@ -226,6 +241,11 @@ export default function ThanhToan() {
                             </div>
                         </div>
 
+                        {submitError && (
+                            <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                {submitError}
+                            </p>
+                        )}
                         <button
                             onClick={handlePlaceOrder}
                             disabled={placing}
