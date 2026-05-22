@@ -1101,6 +1101,22 @@ app.post("/api/products", authenticateJWT, (req, res) => {
         updated_at: now,
     };
     products.push(product);
+
+    const defaultVariant = {
+        id: `var-${variants.length + 1}`,
+        product_id: product.id,
+        sku: `${product.slug.toUpperCase()}-DEFAULT`,
+        name: "Default",
+        shade: null,
+        size: null,
+        price: product.base_price,
+        sale_price: null,
+        stock: 100,
+        image_url: product.images[0] || "",
+        is_default: true,
+    };
+    variants.push(defaultVariant);
+
     res.status(201).json({ message: "Product created successfully", product });
 });
 

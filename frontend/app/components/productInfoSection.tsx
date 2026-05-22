@@ -19,6 +19,9 @@ const ProductInfoSection = ({ product }: ProductInfoSectionProps) => {
     const displayPrice = selectedVariant?.sale_price ?? selectedVariant?.price ?? product.base_price;
     const originalPrice = selectedVariant?.price ?? product.base_price;
     const hasDiscount = selectedVariant?.sale_price && selectedVariant.sale_price < selectedVariant.price;
+    const ratingValue = typeof product.rating === 'number' && Number.isFinite(product.rating) ? product.rating : 0;
+    const displayRating = ratingValue.toFixed(1);
+    const canAddToCart = selectedVariant !== undefined && selectedVariant.stock > 0;
 
     return (
         <div className="space-y-6">
@@ -31,7 +34,7 @@ const ProductInfoSection = ({ product }: ProductInfoSectionProps) => {
 
                 <div className="mt-6 flex items-center gap-3">
                     <span className="rounded-full bg-pink-500 px-3 py-1 text-sm font-semibold text-white">
-                        {product.rating.toFixed(1)}
+                        {displayRating}
                     </span>
                     <span className="text-sm text-gray-600">{product.review_count} đánh giá</span>
                 </div>
@@ -122,15 +125,18 @@ const ProductInfoSection = ({ product }: ProductInfoSectionProps) => {
                                     router.push(`/login?from=${encodeURIComponent(window.location.pathname)}`);
                                     return;
                                 }
-                                dispatch(addToCart({ variantId: selectedVariant!.id, quantity }));
+                                if (!selectedVariant) {
+                                    return;
+                                }
+                                dispatch(addToCart({ variantId: selectedVariant.id, quantity }));
                             }}
-                            disabled={selectedVariant && selectedVariant.stock === 0}
-                            className={`inline-flex items-center justify-center rounded-full px-8 py-3 text-sm font-semibold transition hover:scale-[1.02] ${selectedVariant?.stock === 0
+                            disabled={!canAddToCart}
+                            className={`inline-flex items-center justify-center rounded-full px-8 py-3 text-sm font-semibold transition hover:scale-[1.02] ${!canAddToCart
                                 ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                                 : 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg hover:shadow-2xl'
                                 }`}
                         >
-                            {selectedVariant?.stock === 0 ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
+                            {!selectedVariant ? 'Chưa có biến thể' : selectedVariant.stock === 0 ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
                         </button>
                     </div>
                 </div>
@@ -168,8 +174,8 @@ const ProductInfoSection = ({ product }: ProductInfoSectionProps) => {
                         <tr>
                             <td className="py-2.5 pr-4 text-gray-500 font-medium">Đánh giá</td>
                             <td className="py-2.5 text-gray-800">
-                                {'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}
-                                {' '}<span className="text-gray-500">({product.rating.toFixed(1)} / {product.review_count} đánh giá)</span>
+                                {'★'.repeat(Math.round(ratingValue))}{'☆'.repeat(5 - Math.round(ratingValue))}
+                                {' '}<span className="text-gray-500">({displayRating} / {product.review_count} đánh giá)</span>
                             </td>
                         </tr>
                         {product.tags?.length > 0 && (

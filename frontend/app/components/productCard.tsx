@@ -26,7 +26,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     <span className="text-lg font-bold text-pink-600">{product.base_price.toLocaleString('vi-VN')} VND</span>
                     <div className="flex items-center">
                         <span className="text-yellow-500 mr-1">★</span>
-                        <span className="text-sm text-pink-600">{product.rating} ({product.review_count})</span>
+                        <span className="text-sm text-pink-600">{product.rating ?? 0} ({product.review_count})</span>
                     </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1">

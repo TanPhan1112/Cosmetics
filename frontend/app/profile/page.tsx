@@ -21,7 +21,7 @@ export default async function Profile() {
 
     const user = await res.json();
 
-    const ordersRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
+    const ordersRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/myorders`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
     });
